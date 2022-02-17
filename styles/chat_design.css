@@ -1,0 +1,123 @@
+/*
+
+.stripeEven{
+    background: #E9F1E7;
+    height: 30px;
+    line-height: 30px;
+    color: #000;
+    text-align: left
+}
+
+.stripeOdd{
+    background: #FEF1E4;
+    height: 30px;
+    line-height: 30px;
+    color: #000;
+    text-align: left
+}
+*/
+ body {
+		 
+		margin:0;
+	padding:0;
+	font-size:12px;
+	font-family:verdana, Arial, Helvetica, sans-serif;
+	overflow: scroll;
+	overflow-y: scroll;
+	overflow-x: scroll;
+	}
+		
+	/*img{display:block; margin:0; padding:0; border:none;} */
+	
+/*	div{
+	position:relative;
+	margin:0 auto 0;
+	display:block;
+	width:100%;
+	background-color: #4ab950;
+	
+	}
+	*/
+	table{
+	width:60%;
+	border-collapse:collapse;
+	table-layout:auto;
+	vertical-align:top;
+	margin-bottom:15px;
+	border:1px solid #CCCCCC;
+	}
+	span{
+		font-family: inherit;
+		font-size: large;
+		color: white;
+	}
+.field{
+ height: 35px;
+ width: 600px;
+ font-size: large;
+ color: #777777;
+}
+
+.datefield{
+ height: 35px;
+ width: 95px;
+ font-size: large;
+ color: #777777;
+}
+.logfield{
+    
+height: 25px;
+ width: 200px;
+ font-size: medium;
+ color: #777777;
+}
+
+/*#main_container  td a, .button{
+	margin: 10px 0px; 
+	padding: 5px 14px; 
+	border: 1px solid #dfdfdf; 
+	background: #dddddd;
+	color: #666666;
+}*/
+ .takon tr:first-child{
+    background-color: #70b46d;
+ }
+ .takon tr:last-child{
+    background-color: #b0ffff;
+ }
+ .takon tr{
+    background-color: #6ca36b;
+ }
+ tr:hover{
+	background: #e6f9bf;
+	color: #001a00;
+}
+#main_container td a:hover, .button:hover{
+	margin: 10px 0px; 
+	padding: 5px 14px; 
+	border: 1px solid #dfdfdf; 
+	background: #9b9b9b;
+	color: #666666;
+}
+	.footer
+	{
+		clear: both; width: 100%; /*height: 5em;*/ font-size: 10px; background-color: red;
+	}
+	#menu{
+		background-color: red;
+		clear: both; width: 100%;
+		height: 2em;
+	}
+/*	#header{
+		background-color: #4ab950;
+		clear: both; width: 100%;
+	} */
+	#biodata { font-family: Verdana, Geneva, sans-serif;
+font-size:13px;
+font-variant:small-caps;
+font-weight: normal;
+ }
+	td{
+		/*text-align:center;*/
+	}
+	input, textarea, select{font-size:12px; font-family:Verdana, Arial, Helvetica, sans-serif;}
