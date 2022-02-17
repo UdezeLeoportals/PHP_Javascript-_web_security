@@ -3,17 +3,18 @@
 // probably smart to require it before we start.
 require_once(LIB_PATH.DS.'database.php');
 
-class User  {
+class Userv  {
 
-	protected static $table_name="user";
-	protected static $db_fields = array('id', 'username', 'argonpassword','type', 'status', 'online');
+	protected static $table_name="userv";
+	protected static $db_fields = array('id', 'userid', 'email', 'question', 'answer', 'createdat', 'deletedat');
 	
 	public $id;
-	public $username;
-	public $type;
-	public $argonpassword;
-	public $status;
-	public $online;
+	public $userid;
+	public $email;
+	public $question;
+	public $answer;
+	public $createdat;
+	public $deletedat;
 	
   
   public static function count_all($unit, $a_session) {
@@ -26,28 +27,9 @@ class User  {
 	public static function find_last() {
 		return self::find_by_sql3("SELECT id FROM ".self::$table_name." ORDER BY id DESC LIMIT 1");
   } 
-  public static function find_() {
-		return self::find_by_sql3("SELECT * FROM ".self::$table_name." WHERE id>720");
-  } 
-  //for vulnerable.php
   	public static function find_mail($email) {
-		$result_array =  self::find_by_sqlv("SELECT * FROM ".self::$table_name." WHERE username = '{$email}' LIMIT 1");
-		return !empty($result_array) ? array_shift($result_array) : false;
+		return self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE username = '{$email}' ORDER BY id DESC LIMIT 1");
   } 
-  //for login.php
-   public static function find_email($id=""){
-      $result_array = self::find_by_sql2("SELECT * FROM ".self::$table_name." WHERE username=? LIMIT 1", $id);  
-      return !empty($result_array) ? array_shift($result_array) : false;
-  }
-  //for login.php
-   public static function find_otpid($id=""){
-      $result_array = self::find_by_sql4("SELECT * FROM ".self::$table_name." WHERE id=? LIMIT 1", $id);  
-      return !empty($result_array) ? array_shift($result_array) : false;
-  }
-    //new function for password retrieval 
-   public static function find_by_mail($id=""){
-      return self::find_by_sql2("SELECT * FROM ".self::$table_name." WHERE username=? LIMIT 1", $id);  
-  }
     public static function authenticate($username="", $password="") {
     global $database;
     $username = $database->escape_value($username);
@@ -67,14 +49,16 @@ class User  {
 	
        	return !empty($result_array) ? array_shift($result_array) : false;
 	}
-	public static function authenticatev($username="", $password="", $argonpassword="") {
+	public static function authenticatev($username="", $password="") {
     global $database;
+    //$username = $database->escape_value($username);
+    //$password = $database->escape_value($password);
 
-    $pass = password_verify($password, $argonpassword) ? 1:0;
     $sql  = "SELECT * FROM  ".self::$table_name."  ";
     $sql .= "WHERE username = '{$username}' ";
-    $sql .= "AND ".$pass;
-    $sql .= "=1 LIMIT 1";
+    $sql .= "AND password = '{$password}' ";
+    $sql .= "AND status = 1 ";
+    $sql .= "LIMIT 1";
 	
     $result_array = self::find_by_sqlv($sql);
 	
@@ -86,16 +70,133 @@ class User  {
 		return self::find_by_sql("SELECT * FROM ".self::$table_name." order by username");
   }
    
-    
-
- 
+    public static function find_question($email, $question, $answer) {
+		return self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE email = ? AND question = '{$question}' AND answer = ? LIMIT 1 ", $email, $answer);
+    }
+	
+	public static function find_inactive($per_page=10, $offset) {
+		return self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE active = 0   ORDER BY surname, first_name, username, a_level   LIMIT  ".$per_page. " OFFSET ".$offset." ");
+    }
+	
+    public static function find_by_level($id=""){
+      return self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE type='".$id."' LIMIT 1");  
+  }
+  public static function change_a_level($id=0, $a_level){
+      return self::find_by_sql("UPDATE ".self::$table_name." SET type='{$a_level}' WHERE id=".$id."");  
+  } 
+    public static function change_status($id, $new_status){
+	global $database;
+	$new_status = $database->escape_value($new_status);
+      	self::find_by_sql( " UPDATE ".self::$table_name." SET status = ".$new_status." where id = ".$id);
+   }
+   //new function for password retrieval
+   public static function find_by_mail($id=""){
+      return self::find_by_sql2("SELECT * FROM ".self::$table_name." WHERE username=? LIMIT 1", $id);  
+  }
   //function to change username
   public static function change_username($id=0, $a_level){
       return self::find_by_sql("UPDATE ".self::$table_name." SET username='{$a_level}' WHERE id=".$id."");  
   } 
-    
+    public static function get_password($id){
+		global $database;
+		$result = $database->query(" SELECT   password as numb FROM ".self::$table_name." WHERE id  = {$id} ");
+		$count = $database->fetch_array($result);
+		return $count['numb'];
+    }
+	
+	public static function get_lga($id){
+		
+		global $database;
+		$result = $database->query("SELECT  lga as numb FROM ".self::$table_name." WHERE id  = {$id} ");
+		$count = $database->fetch_array($result);
+		return $count['numb'];
+    }
+	
+	
+	
+	public static function get_role($id){
+		global $database;
+		$result = $database->query("SELECT  a_level as numb FROM ".self::$table_name." WHERE id  = {$id} ");
+		$count = $database->fetch_array($result);
+		return $count['numb'];
+    }
+	
+	public static function is_admin($id){
+		global $database;
+		$result = $database->query(" SELECT   1 as numb  FROM ".self::$table_name." WHERE id  = {$id} AND a_level = 'admin' AND status =  1");
+		$count = $database->fetch_array($result);
+		return ($count['numb'] == 1) ? true : false;
+    }
+	
+	public static function is_mob($id){
+		global $database;
+		$result = $database->query(" SELECT   1 as numb FROM ".self::$table_name." WHERE id  = {$id}  AND active = 1 AND ( a_level IN ('mob',  'admin'))");
+		$count = $database->fetch_array($result);
+		return ($count['numb'] == 1) ? true : false;
+    }
+	
+	public static function is_staff($id){
+		global $database;
+		$result = $database->query(" SELECT   1 as numb  FROM ".self::$table_name." WHERE id  = {$id}  AND status = 1 ");
+		$count = $database->fetch_array($result);
+		return ($count['numb'] ==  1) ? true : false;
+    }
+	
+   public static function change_password($id, $new_password){
+       global $database;
+       $id = $database->escape_value($id);
+       $new_password = $database->escape_value($new_password);
+      	self::find_by_sql( "UPDATE ".self::$table_name." SET password = '".$new_password."' WHERE id = ".$id);
+   }
+   
+	public static function change_role($id, $new_role, $new_lga = 0){
+      	self::find_by_sql( " UPDATE ".self::$table_name." SET a_level = '".$new_role."', lga = {$new_lga} where id = ".$id);
+    }
+   
+   public static function edit_profile($id, $surname, $first_name, $sex){
+	global $database;
+	$surname = $database->escape_value($surname);
+	$first_name = $database->escape_value($first_name);
+	$sex = $database->escape_value($sex);
+	self::find_by_sql(" UPDATE ".self::$table_name." SET surname = '{$surname}', first_name = '{$first_name}', sex = '{$sex}' WHERE id = ".$id);
+   }
+   
+   public static function get_fullname($id){
+	global $database;
+	$result = $database->query(" SELECT   surname, first_name FROM ".self::$table_name."   WHERE  id = '".$id."'  LIMIT 1");
+	$user = $database->fetch_array($result);
+	return $user['surname']."  ".$user['first_name'];
+   }
+   
+   
+   public static function get_count(){
+	global $database;
+	$result = $database->query(" SELECT   count(id) as numb FROM ".self::$table_name."   WHERE  active = 1");
+	$count = $database->fetch_array($result);
+	return $count['numb'];
+   }
+   
+   	
+	public static function count_active(){
+		global $database;
+		$result = $database->query(" SELECT   count(id) as numb FROM ".self::$table_name." WHERE active  = 1");
+		$count = $database->fetch_array($result);
+		return $count['numb'];
+    }
+	
+	public static function count_inactive(){
+		global $database;
+		$result = $database->query(" SELECT   count(id) as numb FROM ".self::$table_name." WHERE active  = 0 ");
+		$count = $database->fetch_array($result);
+		return $count['numb'];
+    }
+  
+ // public static function find_by_id($id=0) {
+  //  $result_array = self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE id={$id} LIMIT 1");
+//		return !empty($result_array) ? array_shift($result_array) : false;
+ // }
   public static function find_by_id($id=0) {
-    return self::find_by_sqlv("SELECT * FROM ".self::$table_name." WHERE id={$id} LIMIT 1");
+    return self::find_by_sql3("SELECT * FROM ".self::$table_name." WHERE id={$id} LIMIT 1");
   }
   
   public static function delete($id=0) {
@@ -133,21 +234,11 @@ public static function find_by_sql2($sql="", $username) {
       $object_array[] = self::instantiate($row);
     }
     return $object_array;
-  }//
+  }
 public static function find_by_sql3($sql="") {
 	
     global $database;
     $result_set = $database->query3($sql);
-    $object_array = array();
-    while ($row = $result_set->fetch_assoc()) {
-      $object_array[] = self::instantiate($row);
-    }
-    return $object_array;
-  }
-  public static function find_by_sql4($sql="", $id) {
-	
-    global $database;
-    $result_set = $database->query2($sql, $id);
     $object_array = array();
     while ($row = $result_set->fetch_assoc()) {
       $object_array[] = self::instantiate($row);
